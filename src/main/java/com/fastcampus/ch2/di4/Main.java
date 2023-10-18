@@ -6,16 +6,49 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
 //@SpringBootApplication // 은 아래 3개 애너테이션을 붙인 것과 동일
 
-@SpringBootConfiguration // @Configuration과 동일
+@Component
+@Conditional(TrueCondition.class)
+class Engine {
+    public String toString() {
+        return "Engine{}";
+    }
+}
+
+@Component
+@Conditional(FalseCondition.class)
+class Door {
+    public String toString() {
+        return "Door{}";
+    }
+}
+
+class TrueCondition implements Condition {
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        return true;
+    }
+}
+
+class FalseCondition implements Condition {
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        Environment env = context.getEnvironment();
+        System.out.println("System.getProperties() = " + System.getProperties());
+//        env.getProperty()
+        return false;
+    }
+}
+
+@Configuration // @Configuration과 동일
 ////@EnableAutoConfiguration
-@ComponentScan
+@ServletComponentScan
 public class Main {
 
     public static void main(String[] args) {
